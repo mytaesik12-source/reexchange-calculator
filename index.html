@@ -273,9 +273,9 @@
         <div class="field">
           <label for="currency">통화</label>
           <select id="currency">
-            <option value="JPY" data-rate="920" selected>일본 엔 (JPY)</option>
-            <option value="USD" data-rate="1390">미국 달러 (USD)</option>
-            <option value="EUR" data-rate="1500">유로 (EUR)</option>
+            <option value="JPY" data-rate="920" data-unit="100" selected>일본 엔 (JPY)</option>
+            <option value="USD" data-rate="1390" data-unit="1">미국 달러 (USD)</option>
+            <option value="EUR" data-rate="1500" data-unit="1">유로 (EUR)</option>
           </select>
         </div>
 
@@ -285,7 +285,7 @@
             <input type="number" id="amount" value="30000" min="0" step="100">
           </div>
           <div class="field">
-            <label for="rate">적용 환율(원)</label>
+            <label for="rate" id="rateLabel">적용 환율 (100엔당, 원)</label>
             <input type="number" id="rate" value="920" min="0" step="0.1">
           </div>
         </div>
@@ -348,7 +348,8 @@ function fmt(n){
 function calc(){
   const amount = parseFloat(document.getElementById('amount').value) || 0;
   const rate = parseFloat(document.getElementById('rate').value) || 0;
-  const gross = amount * rate;
+  const unit = parseFloat(document.getElementById('currency').selectedOptions[0].dataset.unit) || 1;
+  const gross = amount * rate / unit;
 
   const cards = [
     {
@@ -460,6 +461,9 @@ function render(){
 document.getElementById('currency').addEventListener('change', (e) => {
   const opt = e.target.selectedOptions[0];
   document.getElementById('rate').value = opt.dataset.rate;
+  const unit = opt.dataset.unit;
+  const unitLabel = unit === '100' ? '100엔당' : (opt.value === 'USD' ? '1달러당' : '1유로당');
+  document.getElementById('rateLabel').textContent = `적용 환율 (${unitLabel}, 원)`;
   render();
 });
 
